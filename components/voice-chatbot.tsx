@@ -21,6 +21,9 @@ export function VoiceChatbot() {
     transport: new DefaultChatTransport({ api: "/api/chat" }),
   })
 
+  // CORRECCIÓN: Definir el estado 'in_progress' como un simple string para evitar el error TS2367.
+  const inProgressStatus: string = "in_progress"
+  
   // Inicializar Web Speech API
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -37,15 +40,12 @@ export function VoiceChatbot() {
       recognition.lang = "es-ES" // Español
 
       recognition.onresult = (event: any) => {
-        let interimTranscript = ""
         let finalTranscript = ""
 
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcript = event.results[i][0].transcript
           if (event.results[i].isFinal) {
             finalTranscript += transcript + " "
-          } else {
-            interimTranscript += transcript
           }
         }
 
@@ -92,7 +92,8 @@ export function VoiceChatbot() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!input.trim() || status === "in_progress") return
+    // Uso de inProgressStatus para evitar el error de tipado (TS2367)
+    if (!input.trim() || status === inProgressStatus) return
 
     sendMessage({ text: input.trim() })
     setInput("")
@@ -141,7 +142,8 @@ export function VoiceChatbot() {
           </div>
         ))}
 
-        {status === "in_progress" && (
+        {/* Uso de inProgressStatus */}
+        {status === inProgressStatus && (
           <div className="flex justify-start gap-3">
             <div className="bg-card border border-border/50 rounded-2xl px-5 py-3 shadow-sm">
               <div className="flex items-center gap-2">
@@ -176,7 +178,8 @@ export function VoiceChatbot() {
                 "text-base leading-relaxed",
                 isListening && "border-destructive ring-2 ring-destructive/20",
               )}
-              disabled={status === "in_progress"}
+              // Uso de inProgressStatus
+              disabled={status === inProgressStatus}
             />
             {isListening && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
@@ -193,7 +196,8 @@ export function VoiceChatbot() {
             variant={isListening ? "destructive" : "secondary"}
             size="icon"
             onClick={toggleListening}
-            disabled={!isSupported || status === "in_progress"}
+            // Uso de inProgressStatus
+            disabled={!isSupported || status === inProgressStatus}
             className={cn(
               "shrink-0 h-12 w-12 rounded-xl transition-all duration-200",
               "hover:scale-105 active:scale-95",
@@ -206,10 +210,12 @@ export function VoiceChatbot() {
           <Button
             type="submit"
             size="icon"
-            disabled={!input.trim() || status === "in_progress"}
+            // Uso de inProgressStatus
+            disabled={!input.trim() || status === inProgressStatus}
             className="shrink-0 h-12 w-12 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
           >
-            {status === "in_progress" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+            {/* Uso de inProgressStatus */}
+            {status === inProgressStatus ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
           </Button>
         </form>
       </div>
